@@ -1,13 +1,26 @@
 import { syncUser } from "@/lib/syncUser";
+import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
+import FeaturesSection from "@/components/FeaturesSection";
+import HowItWorksSection from "@/components/HowItWorksSection";
+import TestimonialsSection from "@/components/TestimonialsSection";
+import PricingSection from "@/components/PricingSection";
+import CTASection from "@/components/CTASection";
+import Footer from "@/components/Footer";
 export default async function Home() {
   const user = await syncUser();
-  console.log(user)
+  // console.log(user.role)
   return (
   
-    <div className="flex min-h-screen items-center justify-center font-sans ">
-      <HeroSection/>
-
+    <div className=" min-h-screen bg-background">
+       <Navbar />
+      <HeroSection />
+      <FeaturesSection />
+      <HowItWorksSection />
+      <TestimonialsSection />
+      <PricingSection />
+      <CTASection />
+      <Footer />
     </div>
   );
 }
