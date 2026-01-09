@@ -34,6 +34,7 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   problems  Problem[]
+  solvedBy  ProblemSolved[]
 
   @@index([role])
 }
@@ -53,6 +54,7 @@ model Problem {
   testCases          Json
   codeSnippets       Json
   referenceSolutions Json
+  solvedBy           ProblemSolved[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -60,4 +62,16 @@ model Problem {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([difficulty])
+}
+
+model ProblemSolved {
+  id        String    @id @default(uuid())
+  userId    String
+  problemId String
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@index([userId, problemId])
 }

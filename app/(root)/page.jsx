@@ -1,5 +1,4 @@
 import { syncUser } from "@/lib/syncUser";
-import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import FeaturesSection from "@/components/FeaturesSection";
 import HowItWorksSection from "@/components/HowItWorksSection";
@@ -9,11 +8,10 @@ import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
 export default async function Home() {
   const user = await syncUser();
-  // console.log(user.role)
+  
   return (
   
     <div className=" min-h-screen bg-background">
-       <Navbar />
       <HeroSection />
       <FeaturesSection />
       <HowItWorksSection />

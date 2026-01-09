@@ -1,0 +1,21 @@
+import { syncUser } from '@/lib/syncUser';
+import React from 'react'
+import CreateProblemForm from './create-problem-form';
+
+const CreateProblemPage = async () => {
+
+  const user = await syncUser();
+  // console.log("user from problem page", user)
+  if (user.role !== "ADMIN") {
+    return (
+      <div>Unauthorized</div>
+    );
+  }
+  return (
+    <div className="container mx-auto">
+      <CreateProblemForm />
+    </div>
+  )
+}
+
+export default CreateProblemPage
