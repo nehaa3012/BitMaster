@@ -86,8 +86,8 @@ export async function deleteProblem(id) {
                 id: id
             }
         });
-        return problem;
         revalidatePath("/problems");
+        return problem;
     } catch (error) {
         console.error("Error deleting problem:", error);
         throw error;
@@ -137,7 +137,7 @@ export async function getLeaderboardData() {
                 solvedBy: {
                     _count: "desc",
                 },
-            }, 
+            },
         });
 
         // Format for easier use in frontend
@@ -153,5 +153,56 @@ export async function getLeaderboardData() {
         console.error("Error fetching leaderboard data:", error);
         throw error;
     }
-} 
+}
 
+// Create Playlist
+export async function createPlaylist(title, problems) {
+    try {
+        if (!title || !problems || !Array.isArray(problems) || problems.length === 0) {
+            throw new Error("Title and at least one problem are required");
+        }
+        console.log("problems", problems);
+        console.log("title", title);
+        const user = await syncUser();
+        const playlist = await prisma.playlist.create({
+            include: {
+                problems: true
+            },
+            data: {
+                title: title,
+                userId: user.id,
+                problems: {
+                    connect: problems.map(problem => ({ id: problem.id }))
+                }
+            }
+        });
+
+        revalidatePath("/playlists");
+        return playlist;
+    } catch (error) {
+        console.error("Error creating playlist:", error);
+        throw error;
+    }
+}
+
+// Get user playlists
+export async function getUserPlaylists() {
+    try {
+        const user = await syncUser();
+        const playlists = await prisma.playlist.findMany({
+            where: {
+                userId: user.id
+            },
+            include: {
+                problems: true
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
+        return playlists;
+    } catch (error) {
+        console.error("Error fetching user playlists:", error);
+        throw error;
+    }
+}

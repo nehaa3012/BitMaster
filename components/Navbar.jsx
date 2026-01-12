@@ -5,7 +5,7 @@ import { UserButton } from '@clerk/nextjs'
 import { ModeToggle } from './mode-toggle'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { PlusCircle, Database, Code2, Trophy, Search, Loader2, User } from 'lucide-react'
+import { PlusCircle, Database, Code2, Trophy, Search, Loader2, User, Library } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
 
 const Navbar = ({ role }) => {
@@ -79,6 +79,13 @@ const Navbar = ({ role }) => {
                         >
                             <Trophy className="h-4 w-4" />
                             Leaderboard
+                        </Link>
+                        <Link
+                            href="/playlists"
+                            className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary flex items-center gap-1.5"
+                        >
+                            <Library className="h-4 w-4" />
+                            Playlists
                         </Link>
                     </nav>
                 </div>

@@ -11,19 +11,39 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { CheckCircle, XCircle, Trash2, Edit } from "lucide-react"
+import { CheckCircle, XCircle, Trash2, Edit, Plus } from "lucide-react"
 import { deleteProblem } from "@/app/action/serverActions"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner" // Assuming sonner is installed as seen in list_dir 'sonner.jsx'
+import { Checkbox } from "@/components/ui/checkbox"
+import { CreatePlaylistModal } from "./CreatePlaylistModal"
 
 const ProblemTable = ({ problems, userRole }) => {
     const [filterDifficulty, setFilterDifficulty] = useState("ALL");
+    const [selectedProblems, setSelectedProblems] = useState([]);
+    const [isPlaylistModalOpen, setIsPlaylistModalOpen] = useState(false);
     const router = useRouter();
 
     const filteredProblems = problems.filter(problem => {
         if (filterDifficulty === "ALL") return true;
         return problem.difficulty === filterDifficulty;
     });
+
+    const toggleSelectAll = () => {
+        if (selectedProblems.length === filteredProblems.length) {
+            setSelectedProblems([]);
+        } else {
+            setSelectedProblems(filteredProblems);
+        }
+    };
+
+    const toggleSelectProblem = (problem) => {
+        if (selectedProblems.some(p => p.id === problem.id)) {
+            setSelectedProblems(selectedProblems.filter(p => p.id !== problem.id));
+        } else {
+            setSelectedProblems([...selectedProblems, problem]);
+        }
+    };
 
     const handleDelete = async (id) => {
         if (confirm("Are you sure you want to delete this problem?")) {
@@ -50,10 +70,17 @@ const ProblemTable = ({ problems, userRole }) => {
     return (
         <div className="space-y-4 p-4">
             <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold">Problems List</h2>
-                <div className="w-[180px]">
+                <div>
+                    <h2 className="text-xl font-semibold">Problems List</h2>
+                    {selectedProblems.length > 0 && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                            {selectedProblems.length} problems selected
+                        </p>
+                    )}
+                </div>
+                <div className="flex gap-2 items-center">
                     <Select value={filterDifficulty} onValueChange={setFilterDifficulty}>
-                        <SelectTrigger>
+                        <SelectTrigger className="w-[180px]">
                             <SelectValue placeholder="Filter by Difficulty" />
                         </SelectTrigger>
                         <SelectContent>
@@ -63,13 +90,29 @@ const ProblemTable = ({ problems, userRole }) => {
                             <SelectItem value="HARD">Hard</SelectItem>
                         </SelectContent>
                     </Select>
+
+                    <Button
+                        variant={selectedProblems.length > 0 ? "default" : "outline"}
+                        className="gap-2"
+                        disabled={selectedProblems.length === 0}
+                        onClick={() => setIsPlaylistModalOpen(true)}
+                    >
+                        <Plus className="h-4 w-4" />
+                        Create Playlist
+                    </Button>
                 </div>
             </div>
 
-            <div className="rounded-md border border-gray-200">
+            <div className="rounded-md border border-gray-200 overflow-hidden shadow-sm">
                 <Table>
-                    <TableHeader>
+                    <TableHeader className="bg-muted/30">
                         <TableRow>
+                            <TableHead className="w-[50px]">
+                                <Checkbox
+                                    checked={selectedProblems.length === filteredProblems.length && filteredProblems.length > 0}
+                                    onCheckedChange={toggleSelectAll}
+                                />
+                            </TableHead>
                             <TableHead className="w-[100px]">Status</TableHead>
                             <TableHead>Title</TableHead>
                             <TableHead>Difficulty</TableHead>
@@ -80,13 +123,19 @@ const ProblemTable = ({ problems, userRole }) => {
                     <TableBody>
                         {filteredProblems.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={userRole === 'ADMIN' ? 5 : 4} className="h-24 text-center">
+                                <TableCell colSpan={userRole === 'ADMIN' ? 6 : 5} className="h-24 text-center">
                                     No problems found.
                                 </TableCell>
                             </TableRow>
                         ) : (
                             filteredProblems.map((problem) => (
-                                <TableRow key={problem.id}>
+                                <TableRow key={problem.id} className={selectedProblems.some(p => p.id === problem.id) ? "bg-primary/5" : ""}>
+                                    <TableCell>
+                                        <Checkbox
+                                            checked={selectedProblems.some(p => p.id === problem.id)}
+                                            onCheckedChange={() => toggleSelectProblem(problem)}
+                                        />
+                                    </TableCell>
                                     <TableCell>
                                         {problem.isSolved ? (
                                             <CheckCircle className="h-5 w-5 text-green-500" />
@@ -103,7 +152,6 @@ const ProblemTable = ({ problems, userRole }) => {
                                         </Badge>
                                     </TableCell>
                                     <TableCell>
-                                        {/* Placeholder for acceptance rate if available, or just random/static for now if not in schema */}
                                         N/A
                                     </TableCell>
                                     {userRole === 'ADMIN' && (
@@ -124,6 +172,13 @@ const ProblemTable = ({ problems, userRole }) => {
                     </TableBody>
                 </Table>
             </div>
+
+            <CreatePlaylistModal
+                isOpen={isPlaylistModalOpen}
+                onClose={() => setIsPlaylistModalOpen(false)}
+                selectedProblems={selectedProblems}
+                onClearSelection={() => setSelectedProblems([])}
+            />
         </div>
     )
 }

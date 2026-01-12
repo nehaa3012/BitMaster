@@ -35,6 +35,7 @@ model User {
   updatedAt DateTime  @updatedAt
   problems  Problem[]
   solvedBy  ProblemSolved[]
+  playlists Playlist[]
 
   @@index([role])
 }
@@ -55,6 +56,7 @@ model Problem {
   codeSnippets       Json
   referenceSolutions Json
   solvedBy           ProblemSolved[]
+  playlists          Playlist[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -73,5 +75,19 @@ model ProblemSolved {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
 
-  @@index([userId, problemId])
+  @@unique([userId, problemId])
+}
+
+model Playlist {
+  id          String     @id @default(uuid())
+  title       String     // Users need a name for their playlist
+  description String?    // Optional description
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problems    Problem[]  // Implicit many-to-many relationship
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([userId])
 }
