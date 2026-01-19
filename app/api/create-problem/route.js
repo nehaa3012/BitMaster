@@ -3,6 +3,7 @@ import { syncUser } from "@/lib/syncUser";
 import { getJudge0LanguageId, submitBatch, pollBatchResults } from "@/lib/judge0";
 import { prisma } from "@/lib/prisma";
 import { generateWrapper } from "@/lib/codeWrapper";
+import { redisHelpers } from "@/lib/redis";
 
 /* =========================
    API ROUTE
@@ -148,6 +149,8 @@ export async function POST(req) {
                 userId: user.id,
             },
         });
+        // delete the cache
+        await redisHelpers.del(`problems:${user.id}`); 
 
         return NextResponse.json(
             {
