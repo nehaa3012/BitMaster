@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import React from 'react'
 import { getLeaderboardData } from '@/app/action/serverActions'
 import {
@@ -16,7 +18,9 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
 const LeaderboardPage = async () => {
+
     const leaderboard = await getLeaderboardData();
+
 
     // Split into top 3 and others
     const top3 = leaderboard.slice(0, 3);
